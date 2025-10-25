@@ -247,22 +247,27 @@ class _RecipeScreenState extends State<RecipeScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            const Row(
-              children: [
-                SizedBox(width: 20),
-                Icon(
-                  Icons.calendar_today_rounded,
-                  color: Colors.white,
-                ),
-                SizedBox(width: 20),
-                Text(
-                  'Meal Planner',
-                  style: TextStyle(
+            InkWell(
+              onTap: () {
+                Navigator.pushNamed(context, MealPlanScreen.routeName);
+              },
+              child: const Row(
+                children: [
+                  SizedBox(width: 20),
+                  Icon(
+                    Icons.calendar_today_rounded,
                     color: Colors.white,
-                    fontWeight: FontWeight.w500,
                   ),
-                )
-              ],
+                  SizedBox(width: 20),
+                  Text(
+                    'Meal Planner',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  )
+                ],
+              ),
             ),
           ],
         ),
