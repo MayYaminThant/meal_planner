@@ -4,6 +4,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:hive/hive.dart';
 
 import '../../components/export_files.dart';
+import '../../hive/favourite_recipe_hive_service.dart';
 
 class RecipeDetailScreen extends StatefulWidget {
   const RecipeDetailScreen({super.key, required this.recipe});
@@ -15,18 +16,30 @@ class RecipeDetailScreen extends StatefulWidget {
 }
 
 class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
-  bool? isFavorite;
-  Box<Recipe>? favoritesBox;
+  ValueNotifier<bool> isFavorite = ValueNotifier(false);
+  Box favoritesBox = HiveBoxes.getFavouriteIdBox();
+  Box<Recipe> recipeBox = HiveBoxes.getAllRecipeBox();
   Map<String, dynamic>? nutritionData;
+  HiveFavouriteRecipeService? hiveFavouriteRecipeService;
+
+  @override
+  void dispose() {
+    isFavorite.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
     super.initState();
-    favoritesBox = HiveBoxes.getFavouriteBox();
-    isFavorite = favoritesBox?.containsKey(widget.recipe.id) ?? false;
-    context
-        .read<RecipeController>()
-        .getSimilarRecipeList(similarId: widget.recipe.id ?? -1);
+
+    hiveFavouriteRecipeService =
+        HiveFavouriteRecipeService(favoritesBox, recipeBox);
+    isFavorite.value =
+        hiveFavouriteRecipeService?.isFavourite(widget.recipe.id ?? -1) ??
+            false;
+    // context
+    //     .read<RecipeController>()
+    //     .getSimilarRecipeList(similarId: widget.recipe.id ?? -1);
     _parseRecipeData();
   }
 
@@ -80,19 +93,28 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                 style: const ButtonStyle(iconSize: WidgetStatePropertyAll(26)),
               ),
               actions: [
-                IconButton(
-                  icon: Icon(
-                    (isFavorite ?? false)
-                        ? Icons.favorite
-                        : Icons.favorite_border,
-                    color: Colors.redAccent,
-                  ),
-                  onPressed: () {
-                    context
-                        .read<RecipeController>()
-                        .toggleFavourite(widget.recipe);
-                  },
-                ),
+                ValueListenableBuilder(
+                    valueListenable: isFavorite,
+                    builder: (_, isfav, __) {
+                      return IconButton(
+                        icon: Icon(
+                          isfav ? Icons.favorite : Icons.favorite_border,
+                          color: Colors.redAccent,
+                        ),
+                        onPressed: () async {
+                          try {
+                            await context
+                                .read<RecipeController>()
+                                .toggleFavourite(widget.recipe);
+                            isFavorite.value = hiveFavouriteRecipeService
+                                    ?.isFavourite(widget.recipe.id ?? -1) ??
+                                false;
+                          } catch (e) {
+                            debugPrint(e.toString());
+                          }
+                        },
+                      );
+                    }),
               ],
             ),
             SliverToBoxAdapter(
@@ -115,7 +137,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                     const SizedBox(height: 36),
                     ..._instructionsWidget(),
                     const SizedBox(height: 36),
-                    ..._similarRecipesWidget(),
+                    SizedBox(height: 60, child: _similarRecipesWidget()),
 
                     //  Nutrition
                     // if (widget.recipe. != null) ...[
@@ -215,64 +237,82 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     ];
   }
 
-  List<Widget> _similarRecipesWidget() {
-    return context.read<RecipeController>().similarrecipeList.map((recipe) {
-      return Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Card(
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          margin: const EdgeInsets.all(8),
-          clipBehavior: Clip.antiAlias,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Recipe Image
-              AspectRatio(
-                aspectRatio: 16 / 9,
-                child: Image.network(
-                  recipe.image ?? '',
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    color: Colors.grey[200],
-                    child: const Icon(Icons.image_not_supported, size: 40),
-                  ),
+  Widget _similarRecipesWidget() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children:
+            context.read<RecipeController>().similarrecipeList.map((recipe) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.network(
+                'https://img.spoonacular.com/recipes/${recipe.image ?? ''}',
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  color: Colors.grey[200],
+                  child: const Icon(Icons.image_not_supported, size: 40),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      recipe.title ?? 'Untitled Recipe',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                    ),
-                    const SizedBox(height: 6),
-                    if (recipe.summary != null)
-                      Text(
-                        recipe.summary!,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodySmall
-                            ?.copyWith(color: Colors.grey[600]),
-                      ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }).toList();
+            ),
+            //  Card(
+            //   elevation: 4,
+            //   shape: RoundedRectangleBorder(
+            //     borderRadius: BorderRadius.circular(16),
+            //   ),
+            //   margin: const EdgeInsets.all(8),
+            //   clipBehavior: Clip.antiAlias,
+            //   child: Column(
+            //     crossAxisAlignment: CrossAxisAlignment.start,
+            //     children: [
+            //       // Recipe Image
+            //       AspectRatio(
+            //         aspectRatio: 16 / 9,
+            //         child: Image.network(
+            //           recipe.image ?? '',
+            //           fit: BoxFit.cover,
+            //           errorBuilder: (_, __, ___) => Container(
+            //             color: Colors.grey[200],
+            //             child: const Icon(Icons.image_not_supported, size: 40),
+            //           ),
+            //         ),
+            //       ),
+            //       Padding(
+            //         padding: const EdgeInsets.all(12),
+            //         child: Column(
+            //           crossAxisAlignment: CrossAxisAlignment.start,
+            //           children: [
+            //             Text(
+            //               recipe.title ?? 'Untitled Recipe',
+            //               maxLines: 2,
+            //               overflow: TextOverflow.ellipsis,
+            //               style:
+            //                   Theme.of(context).textTheme.titleMedium?.copyWith(
+            //                         fontWeight: FontWeight.w600,
+            //                       ),
+            //             ),
+            //             const SizedBox(height: 6),
+            //             if (recipe.summary != null)
+            //               Text(
+            //                 recipe.summary!,
+            //                 maxLines: 2,
+            //                 overflow: TextOverflow.ellipsis,
+            //                 style: Theme.of(context)
+            //                     .textTheme
+            //                     .bodySmall
+            //                     ?.copyWith(color: Colors.grey[600]),
+            //               ),
+            //           ],
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
+          );
+        }).toList(),
+      ),
+    );
   }
 
   // Widget _buildNutritionTable() {

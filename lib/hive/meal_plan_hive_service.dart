@@ -26,6 +26,8 @@ class HiveMealPlanService {
   }
 
   List<Recipe> getRecipesFromIds(List<int> ids) {
-    return ids.map((id) => _recipeBox.get(id)).whereType<Recipe>().toList();
+    return _recipeBox.values
+        .where((recipe) => ids.contains(recipe.id))
+        .toList();
   }
 }

@@ -14,7 +14,7 @@ class Step extends HiveObject {
   int? number;
   @HiveField(2)
   @JsonKey(name: "step")
-  String? step;
+  String? stepArg;
   @HiveField(3)
   @JsonKey(name: "ingredients")
   List<Ent>? ingredients;
@@ -27,7 +27,7 @@ class Step extends HiveObject {
 
   Step({
     this.number,
-    this.step,
+    this.stepArg,
     this.ingredients,
     this.equipment,
     this.length,

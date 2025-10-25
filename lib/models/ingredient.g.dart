@@ -20,22 +20,21 @@ class IngredientAdapter extends TypeAdapter<Ingredient> {
       id: fields[1] as int?,
       aisle: fields[2] as String?,
       image: fields[3] as String?,
-      consistency: fields[4] as Consistency?,
-      name: fields[5] as String?,
-      nameClean: fields[6] as String?,
-      original: fields[7] as String?,
-      originalName: fields[8] as String?,
-      amount: fields[9] as double?,
-      unit: fields[10] as String?,
-      meta: (fields[11] as List?)?.cast<String>(),
-      measures: fields[12] as Measures?,
+      name: fields[4] as String?,
+      nameClean: fields[5] as String?,
+      original: fields[6] as String?,
+      originalName: fields[7] as String?,
+      amount: fields[8] as double?,
+      unit: fields[9] as String?,
+      meta: (fields[10] as List?)?.cast<String>(),
+      measures: fields[11] as Measures?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Ingredient obj) {
     writer
-      ..writeByte(12)
+      ..writeByte(11)
       ..writeByte(1)
       ..write(obj.id)
       ..writeByte(2)
@@ -43,22 +42,20 @@ class IngredientAdapter extends TypeAdapter<Ingredient> {
       ..writeByte(3)
       ..write(obj.image)
       ..writeByte(4)
-      ..write(obj.consistency)
-      ..writeByte(5)
       ..write(obj.name)
-      ..writeByte(6)
+      ..writeByte(5)
       ..write(obj.nameClean)
-      ..writeByte(7)
+      ..writeByte(6)
       ..write(obj.original)
-      ..writeByte(8)
+      ..writeByte(7)
       ..write(obj.originalName)
-      ..writeByte(9)
+      ..writeByte(8)
       ..write(obj.amount)
-      ..writeByte(10)
+      ..writeByte(9)
       ..write(obj.unit)
-      ..writeByte(11)
+      ..writeByte(10)
       ..write(obj.meta)
-      ..writeByte(12)
+      ..writeByte(11)
       ..write(obj.measures);
   }
 
@@ -81,8 +78,6 @@ Ingredient _$IngredientFromJson(Map<String, dynamic> json) => Ingredient(
       id: (json['id'] as num?)?.toInt(),
       aisle: json['aisle'] as String?,
       image: json['image'] as String?,
-      consistency:
-          $enumDecodeNullable(_$ConsistencyEnumMap, json['consistency']),
       name: json['name'] as String?,
       nameClean: json['nameClean'] as String?,
       original: json['original'] as String?,
@@ -100,7 +95,6 @@ Map<String, dynamic> _$IngredientToJson(Ingredient instance) =>
       'id': instance.id,
       'aisle': instance.aisle,
       'image': instance.image,
-      'consistency': _$ConsistencyEnumMap[instance.consistency],
       'name': instance.name,
       'nameClean': instance.nameClean,
       'original': instance.original,
@@ -110,8 +104,3 @@ Map<String, dynamic> _$IngredientToJson(Ingredient instance) =>
       'meta': instance.meta,
       'measures': instance.measures,
     };
-
-const _$ConsistencyEnumMap = {
-  Consistency.LIQUID: 'LIQUID',
-  Consistency.SOLID: 'SOLID',
-};

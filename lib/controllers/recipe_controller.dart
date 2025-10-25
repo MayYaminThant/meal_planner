@@ -1,5 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:meal_planner/components/export_files.dart';
+import 'package:meal_planner/hive/favourite_recipe_hive_service.dart';
 import 'package:meal_planner/services/api.dart';
 
 class RecipeController extends ChangeNotifier {
@@ -45,18 +47,21 @@ class RecipeController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void toggleFavourite(Recipe recipe) async {
-    final favBox = HiveBoxes.getFavouriteBox();
+  Future<void> toggleFavourite(Recipe recipe) async {
+    try {
+      final Box<Recipe> recipeBox = HiveBoxes.getAllRecipeBox();
+      final Box<dynamic> favBox = HiveBoxes.getFavouriteIdBox();
+      final HiveFavouriteRecipeService hiveFavouriteRecipeService =
+          HiveFavouriteRecipeService(favBox, recipeBox);
 
-    if (isFavourite(recipe.id ?? -1)) {
-      final toRemove = favBox.values.firstWhere((r) => r.id == recipe.id);
-      await toRemove.delete();
-    } else {
-      await favBox.add(recipe);
+      await hiveFavouriteRecipeService.toggleFavourite(recipe.id ?? -1);
+
+      _favRecipeList = hiveFavouriteRecipeService
+          .getRecipesFromIds(hiveFavouriteRecipeService.getFavouriteIds());
+      notifyListeners();
+    } catch (e) {
+      debugPrint(e.toString());
     }
-
-    _favRecipeList = favBox.values.toList();
-    notifyListeners();
   }
 
   bool isFavourite(int id) {
@@ -69,12 +74,18 @@ class RecipeController extends ChangeNotifier {
   }
 
   Future<void> getRandomRecipeList() async {
-    final allBox = HiveBoxes.getAllRecipeBox();
-    final favBox = HiveBoxes.getFavouriteBox();
+    final Box<dynamic> favBox = HiveBoxes.getFavouriteIdBox();
+    final Box<Recipe> allBox = HiveBoxes.getAllRecipeBox();
+    try {
+      final HiveFavouriteRecipeService hiveFavouriteRecipeService =
+          HiveFavouriteRecipeService(favBox, allBox);
 
-    _recipeList = allBox.values.toList();
-    _favRecipeList = favBox.values.toList();
-
+      _recipeList = allBox.values.toList();
+      _favRecipeList = hiveFavouriteRecipeService
+          .getRecipesFromIds(hiveFavouriteRecipeService.getFavouriteIds());
+    } catch (e) {
+      debugPrint(e.toString());
+    }
     if (await checkOfflineConnectivity()) {
       return;
     }
@@ -101,11 +112,18 @@ class RecipeController extends ChangeNotifier {
   }
 
   Future<void> getRecipeListByIngredients() async {
-    final allBox = HiveBoxes.getAllRecipeBox();
-    final favBox = HiveBoxes.getFavouriteBox();
+    final Box<Recipe> allBox = HiveBoxes.getAllRecipeBox();
+    final Box<dynamic> favBox = HiveBoxes.getFavouriteIdBox();
+    try {
+      final HiveFavouriteRecipeService hiveFavouriteRecipeService =
+          HiveFavouriteRecipeService(favBox, allBox);
 
-    _recipeList = allBox.values.toList();
-    _favRecipeList = favBox.values.toList();
+      _recipeList = allBox.values.toList();
+      _favRecipeList = hiveFavouriteRecipeService
+          .getRecipesFromIds(hiveFavouriteRecipeService.getFavouriteIds());
+    } catch (e) {
+      debugPrint(e.toString());
+    }
 
     if (await checkOfflineConnectivity()) {
       return;

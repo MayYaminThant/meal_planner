@@ -18,7 +18,7 @@ class StepAdapter extends TypeAdapter<Step> {
     };
     return Step(
       number: fields[1] as int?,
-      step: fields[2] as String?,
+      stepArg: fields[2] as String?,
       ingredients: (fields[3] as List?)?.cast<Ent>(),
       equipment: (fields[4] as List?)?.cast<Ent>(),
       length: fields[5] as Length?,
@@ -32,7 +32,7 @@ class StepAdapter extends TypeAdapter<Step> {
       ..writeByte(1)
       ..write(obj.number)
       ..writeByte(2)
-      ..write(obj.step)
+      ..write(obj.stepArg)
       ..writeByte(3)
       ..write(obj.ingredients)
       ..writeByte(4)
@@ -58,7 +58,7 @@ class StepAdapter extends TypeAdapter<Step> {
 
 Step _$StepFromJson(Map<String, dynamic> json) => Step(
       number: (json['number'] as num?)?.toInt(),
-      step: json['step'] as String?,
+      stepArg: json['step'] as String?,
       ingredients: (json['ingredients'] as List<dynamic>?)
           ?.map((e) => Ent.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -72,7 +72,7 @@ Step _$StepFromJson(Map<String, dynamic> json) => Step(
 
 Map<String, dynamic> _$StepToJson(Step instance) => <String, dynamic>{
       'number': instance.number,
-      'step': instance.step,
+      'step': instance.stepArg,
       'ingredients': instance.ingredients,
       'equipment': instance.equipment,
       'length': instance.length,

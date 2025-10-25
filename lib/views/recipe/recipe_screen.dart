@@ -184,13 +184,18 @@ class _RecipeScreenState extends State<RecipeScreen> {
           final recipe = controller.recipeList[index];
           return RecipeCard(
             recipe: recipe,
-            isFavorite: false, // favorites.contains(recipe.id),
+            isFavorite: controller.favRecipeList.indexWhere((e) {
+                  return e.id == recipe.id;
+                }) !=
+                -1,
             // onTap: () => Navigator.pushNamed(
             //   context,
             //   '/recipe_details',
             //   arguments: recipe,
             // ),
-            // onFavoriteToggle: () => toggleFavorite(recipe),
+            onFavoriteToggle: () {
+              controller.toggleFavourite(recipe);
+            },
           );
         },
       );

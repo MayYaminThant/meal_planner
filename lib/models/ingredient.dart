@@ -20,30 +20,27 @@ class Ingredient extends HiveObject {
   @JsonKey(name: "image")
   String? image;
   @HiveField(4)
-  @JsonKey(name: "consistency")
-  Consistency? consistency;
-  @HiveField(5)
   @JsonKey(name: "name")
   String? name;
-  @HiveField(6)
+  @HiveField(5)
   @JsonKey(name: "nameClean")
   String? nameClean;
-  @HiveField(7)
+  @HiveField(6)
   @JsonKey(name: "original")
   String? original;
-  @HiveField(8)
+  @HiveField(7)
   @JsonKey(name: "originalName")
   String? originalName;
-  @HiveField(9)
+  @HiveField(8)
   @JsonKey(name: "amount")
   double? amount;
-  @HiveField(10)
+  @HiveField(9)
   @JsonKey(name: "unit")
   String? unit;
-  @HiveField(11)
+  @HiveField(10)
   @JsonKey(name: "meta")
   List<String>? meta;
-  @HiveField(12)
+  @HiveField(11)
   @JsonKey(name: "measures")
   Measures? measures;
 
@@ -51,7 +48,6 @@ class Ingredient extends HiveObject {
     this.id,
     this.aisle,
     this.image,
-    this.consistency,
     this.name,
     this.nameClean,
     this.original,
@@ -66,26 +62,4 @@ class Ingredient extends HiveObject {
       _$IngredientFromJson(json);
 
   Map<String, dynamic> toJson() => _$IngredientToJson(this);
-}
-
-enum Consistency {
-  @JsonValue("LIQUID")
-  LIQUID,
-  @JsonValue("SOLID")
-  SOLID
-}
-
-final consistencyValues =
-    EnumValues({"LIQUID": Consistency.LIQUID, "SOLID": Consistency.SOLID});
-
-class EnumValues<T> {
-  Map<String, T> map;
-  late Map<T, String> reverseMap;
-
-  EnumValues(this.map);
-
-  Map<T, String> get reverse {
-    reverseMap = map.map((k, v) => MapEntry(v, k));
-    return reverseMap;
-  }
 }

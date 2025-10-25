@@ -29,76 +29,116 @@ class _MealPlanScreenState extends State<MealPlanScreen> {
   Widget build(BuildContext context) {
     _mealPlanService.getAllMealPlans();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Weekly Meal Plan'),
-        backgroundColor: Colors.teal,
+    return SafeArea(
+      child: Scaffold(
+        body: _bodyWidget(),
       ),
-      body: ListView.builder(
-        itemCount: _days.length,
-        itemBuilder: (context, index) {
-          final day = _days[index];
-          final plan = _mealPlanService.getMealPlanForDay(day);
-          final recipes = plan == null
-              ? []
-              : _mealPlanService.getRecipesFromIds(plan.recipeIds);
+    );
+  }
 
-          return Card(
-            margin: const EdgeInsets.all(12),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            child: ExpansionTile(
-              title: Text(
-                day,
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+  Widget _bodyWidget() {
+    return Container(
+      color: ColorUtils.primaryColor,
+      width: SizeMedia.screenWidth(context),
+      height: SizeMedia.screenHeight(context),
+      child: Stack(
+        children: [
+          BackgroundLayerWidget(child: _mainBodyWidget()),
+          Positioned(
+            top: 5,
+            child: Row(
               children: [
-                if (recipes.isEmpty)
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextButton.icon(
+                IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(
+                    Icons.arrow_back_rounded,
+                    color: Colors.white,
+                    size: 30,
+                  ),
+                ),
+                const Text(
+                  'Weekly Meal Plan',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 23,
+                    fontWeight: FontWeight.bold,
+                  ),
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  ListView _mainBodyWidget() {
+    return ListView.builder(
+      itemCount: _days.length,
+      itemBuilder: (context, index) {
+        final day = _days[index];
+        final plan = _mealPlanService.getMealPlanForDay(day);
+        final recipes = plan == null
+            ? []
+            : _mealPlanService.getRecipesFromIds(plan.recipeIds);
+
+        return Card(
+          margin: const EdgeInsets.all(12),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: ExpansionTile(
+            title: Text(
+              day,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            children: [
+              if (recipes.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextButton.icon(
+                    onPressed: () {
+                      _showRecipeSelectionDialog(day);
+                    },
+                    icon: const Icon(Icons.add),
+                    label: const Text("Add recipe"),
+                  ),
+                )
+              else
+                Column(
+                  children: [
+                    ...recipes.map(
+                      (recipe) => ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage: NetworkImage(recipe.image),
+                        ),
+                        title: Text(recipe.title),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete_rounded,
+                              color: Colors.red),
+                          onPressed: () {
+                            final newIds = List<int>.from(plan!.recipeIds)
+                              ..remove(recipe.id);
+                            _mealPlanService.saveMealPlan(day, newIds);
+                            setState(() {});
+                          },
+                        ),
+                      ),
+                    ),
+                    TextButton.icon(
                       onPressed: () {
                         _showRecipeSelectionDialog(day);
                       },
                       icon: const Icon(Icons.add),
-                      label: const Text("Add recipe"),
+                      label: const Text("Add more"),
                     ),
-                  )
-                else
-                  Column(
-                    children: [
-                      ...recipes.map(
-                        (recipe) => ListTile(
-                          leading: CircleAvatar(
-                            backgroundImage: NetworkImage(recipe.image),
-                          ),
-                          title: Text(recipe.title),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () {
-                              final newIds = List<int>.from(plan!.recipeIds)
-                                ..remove(recipe.id);
-                              _mealPlanService.saveMealPlan(day, newIds);
-                              setState(() {});
-                            },
-                          ),
-                        ),
-                      ),
-                      TextButton.icon(
-                        onPressed: () {
-                          _showRecipeSelectionDialog(day);
-                        },
-                        icon: const Icon(Icons.add),
-                        label: const Text("Add more"),
-                      ),
-                    ],
-                  ),
-              ],
-            ),
-          );
-        },
-      ),
+                  ],
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 
