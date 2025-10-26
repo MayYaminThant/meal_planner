@@ -7,4 +7,5 @@ class HiveBoxes {
   static Box<dynamic> getFavouriteIdBox() =>
       Hive.box<dynamic>('favouriteIdBox');
   static Box<MealPlan> getMealPlanBox() => Hive.box<MealPlan>('mealPlans');
+  static Box<CacheTime> getCacheBox() => Hive.box<CacheTime>('cacheBox');
 }

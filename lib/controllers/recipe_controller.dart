@@ -1,10 +1,13 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:meal_planner/components/export_files.dart';
-import 'package:meal_planner/hive/favourite_recipe_hive_service.dart';
-import 'package:meal_planner/services/api.dart';
+
+import '../components/export_files.dart';
+import '../hive/favourite_recipe_hive_service.dart';
+import '../services/api.dart';
 
 class RecipeController extends ChangeNotifier {
+  static const cacheDuration = Duration(minutes: 1);
+
   String? _searchKey;
   String? get searchKey => _searchKey;
   set searchKey(String? searchKey) {
@@ -64,10 +67,6 @@ class RecipeController extends ChangeNotifier {
     }
   }
 
-  bool isFavourite(int id) {
-    return _favRecipeList.any((r) => r.id == id);
-  }
-
   Future<bool> checkOfflineConnectivity() async {
     final connectivity = await Connectivity().checkConnectivity();
     return connectivity.contains(ConnectivityResult.none);
@@ -89,6 +88,17 @@ class RecipeController extends ChangeNotifier {
     if (await checkOfflineConnectivity()) {
       return;
     }
+
+    // todo: I temporarily turned it off because I was worried it might not work with the new data, but after turning it back on, it worked fine.
+    final Box<CacheTime> cacheBox = HiveBoxes.getCacheBox();
+    if (cacheBox.isNotEmpty) {
+      final cache = cacheBox.getAt(0)!;
+      final now = DateTime.now();
+      if (now.difference(cache.lastUpdated) < cacheDuration) {
+        return;
+      }
+    }
+
     recipeList.clear();
     isLoading = true;
 
@@ -96,6 +106,8 @@ class RecipeController extends ChangeNotifier {
       if (response != null &&
           (response.statusCode == 200 || response.statusCode == 201) &&
           response.data != null) {
+        await cacheBox.clear();
+        await cacheBox.add(CacheTime(lastUpdated: DateTime.now()));
         if (response.data['recipes'] is List) {
           final List<dynamic> results = response.data['recipes'];
           for (var data in results) {
@@ -128,6 +140,16 @@ class RecipeController extends ChangeNotifier {
     if (await checkOfflineConnectivity()) {
       return;
     }
+
+    // todo: I temporarily turned it off because I was worried it might not work with the new data, but after turning it back on, it worked fine
+    final Box<CacheTime> cacheBox = HiveBoxes.getCacheBox();
+    if (cacheBox.isNotEmpty) {
+      final cache = cacheBox.getAt(0)!;
+      final now = DateTime.now();
+      if (now.difference(cache.lastUpdated) < cacheDuration) {
+        return;
+      }
+    }
     recipeList.clear();
     isLoading = true;
 
@@ -136,6 +158,8 @@ class RecipeController extends ChangeNotifier {
       if (response != null &&
           (response.statusCode == 200 || response.statusCode == 201) &&
           response.data != null) {
+        await cacheBox.clear();
+        await cacheBox.add(CacheTime(lastUpdated: DateTime.now()));
         if (response.data is List) {
           for (var data in response.data) {
             _recipeList.add(Recipe.fromJson(data));

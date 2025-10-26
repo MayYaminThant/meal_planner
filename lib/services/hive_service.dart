@@ -1,12 +1,13 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:meal_planner/models/step.dart';
 
 import '../components/export_files.dart';
+import '../models/step.dart';
 
 class HiveService {
   static const String recipesBoxName = 'allRecipesBox';
   static const String favouriteRecipes = 'favouriteIdBox';
   static const String mealPlans = 'mealPlans';
+  static const String cacheTime = 'cacheBox';
 
   static Future<void> init() async {
     await Hive.initFlutter();
@@ -20,10 +21,7 @@ class HiveService {
     Hive.registerAdapter(MeasuresAdapter());
     Hive.registerAdapter(MetricAdapter());
     Hive.registerAdapter(StepAdapter());
-
-    await Hive.deleteBoxFromDisk(recipesBoxName);
-    await Hive.deleteBoxFromDisk(favouriteRecipes);
-    await Hive.deleteBoxFromDisk(mealPlans);
+    Hive.registerAdapter(CacheTimeAdapter());
 
     if (!Hive.isBoxOpen(recipesBoxName)) {
       await Hive.openBox<Recipe>(recipesBoxName);
@@ -33,6 +31,9 @@ class HiveService {
     }
     if (!Hive.isBoxOpen(mealPlans)) {
       await Hive.openBox<MealPlan>(mealPlans);
+    }
+    if (!Hive.isBoxOpen(cacheTime)) {
+      await Hive.openBox<CacheTime>(cacheTime);
     }
   }
 }

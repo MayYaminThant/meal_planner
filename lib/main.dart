@@ -1,8 +1,8 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:meal_planner/services/hive_service.dart';
 import 'package:provider/single_child_widget.dart';
 
+import '../services/hive_service.dart';
 import 'components/export_files.dart';
 import 'components/routers.dart';
 

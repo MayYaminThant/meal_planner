@@ -1,4 +1,4 @@
-import 'package:meal_planner/components/export_files.dart';
+import '../components/export_files.dart';
 
 class WifiController extends ChangeNotifier {
   bool _isOffline = false;

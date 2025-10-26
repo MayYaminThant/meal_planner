@@ -219,7 +219,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                       EdgeInsets.symmetric(horizontal: 18, vertical: 4))),
             ),
             const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+              padding: EdgeInsets.symmetric(horizontal: 21, vertical: 4),
               child: Text(
                 'Recipe App',
                 style: TextStyle(
@@ -229,6 +229,11 @@ class _RecipeScreenState extends State<RecipeScreen> {
               ),
             ),
             const SizedBox(height: 40),
+            Divider(
+              color: Colors.white.withOpacity(0.2),
+              thickness: 0.4,
+            ),
+            const SizedBox(height: 20),
             InkWell(
               onTap: () {
                 Navigator.pushNamed(context, FavoriteScreen.routeName);
@@ -246,12 +251,13 @@ class _RecipeScreenState extends State<RecipeScreen> {
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w500,
+                      fontSize: 15.2,
                     ),
                   )
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 22),
             InkWell(
               onTap: () {
                 Navigator.pushNamed(context, MealPlanScreen.routeName);
@@ -269,6 +275,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w500,
+                      fontSize: 15.2,
                     ),
                   )
                 ],

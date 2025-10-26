@@ -1,3 +1,5 @@
+import 'package:cached_network_image/cached_network_image.dart';
+
 import '../../components/export_files.dart';
 
 class RecipeCard extends StatelessWidget {
@@ -63,10 +65,10 @@ class RecipeCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           child: AspectRatio(
             aspectRatio: 1,
-            child: Image.network(
-              recipe.image ?? '',
+            child: CachedNetworkImage(
+              imageUrl: recipe.image ?? '',
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
+              errorWidget: (_, __, ___) => Container(
                 color: Colors.grey[200],
                 child: const Icon(Icons.image_not_supported, size: 40),
               ),

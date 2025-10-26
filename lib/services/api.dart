@@ -4,8 +4,8 @@ import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:meal_planner/components/export_files.dart';
 
+import '../components/export_files.dart';
 import 'api_path.dart';
 
 class ApiServiceConfig {
@@ -196,7 +196,7 @@ class Api {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
     };
-
+    // Data is not included completely (e.g Ingredients, Instructions)
     String apiKey = dotenv.get('API_KEY', fallback: '');
     return request(
       endpoint: APIPath.getRecipesByIngredients.onEndPoint(),

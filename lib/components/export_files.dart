@@ -9,6 +9,7 @@ export '../controllers/wifi_controller.dart';
 export '../hive/hive_boxes.dart';
 export '../hive/meal_plan_hive_service.dart';
 export '../models/analyzed_instruction.dart';
+export '../models/cache_time.dart';
 export '../models/ent.dart';
 export '../models/ingredient.dart';
 export '../models/length.dart';
