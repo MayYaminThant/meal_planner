@@ -86,11 +86,13 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                   return e.id == recipe.id;
                 }) !=
                 -1,
-            // onTap: () => Navigator.pushNamed(
-            //   context,
-            //   '/recipe_details',
-            //   arguments: recipe,
-            // ),
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                RecipeDetailScreen.routeName,
+                arguments: RecipeDetailScreen(recipe: recipe),
+              );
+            },
             onFavoriteToggle: () async {
               await controller.toggleFavourite(recipe);
             },

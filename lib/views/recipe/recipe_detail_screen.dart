@@ -31,8 +31,6 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
 
   @override
   void initState() {
-    super.initState();
-
     hiveFavouriteRecipeService =
         HiveFavouriteRecipeService(favoritesBox, recipeBox);
     isFavorite.value =
@@ -42,6 +40,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
         .read<RecipeController>()
         .getSimilarRecipeList(similarId: widget.recipe.id ?? -1);
     _parseRecipeData();
+    super.initState();
   }
 
   void _parseRecipeData() {
@@ -124,7 +123,6 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    //  Prep time
                     Row(
                       children: [
                         const Icon(Icons.schedule, color: Colors.teal),
@@ -226,7 +224,6 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
       ),
       const SizedBox(height: 8),
       Container(
-        // padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: ColorUtils.primaryColor.withOpacity(0.1),
           borderRadius: BorderRadius.circular(20),
@@ -241,60 +238,63 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
   Widget _similarRecipesWidget() {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: Row(
-        children:
-            context.read<RecipeController>().similarrecipeList.map((recipe) {
-          return Container(
-            width: 140,
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(12),
-                      topRight: Radius.circular(12)),
-                  child: CachedNetworkImage(
-                    height: 100,
-                    imageUrl:
-                        'https://img.spoonacular.com/recipes/${recipe.image ?? ''}',
-                    fit: BoxFit.cover,
-                    errorWidget: (_, __, ___) => Container(
-                      color: Colors.grey[200],
-                      child: const Icon(Icons.image_not_supported, size: 40),
+      child: Consumer<RecipeController>(builder: (_, controller, __) {
+        return Row(
+          children: controller.similarrecipeList.map((recipe) {
+            return Container(
+              width: 140,
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(12),
+                        topRight: Radius.circular(12)),
+                    child: CachedNetworkImage(
+                      height: 100,
+                      imageUrl:
+                          'https://img.spoonacular.com/recipes/${recipe.image ?? ''}',
+                      fit: BoxFit.cover,
+                      errorWidget: (_, __, ___) => Container(
+                        color: Colors.grey[200],
+                        child: const Icon(Icons.image_not_supported, size: 40),
+                      ),
                     ),
                   ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      recipe.title ?? 'Untitled Recipe',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 11,
-                          ),
-                    ),
-                    const SizedBox(height: 6),
-                    if (recipe.summary != null)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
-                        recipe.summary!,
+                        recipe.title ?? 'Untitled Recipe',
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Colors.grey[600],
-                              fontSize: 12,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 11,
+                                ),
                       ),
-                  ],
-                ),
-              ],
-            ),
-          );
-        }).toList(),
-      ),
+                      const SizedBox(height: 6),
+                      if (recipe.summary != null)
+                        Text(
+                          recipe.summary!,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Colors.grey[600],
+                                    fontSize: 12,
+                                  ),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        );
+      }),
     );
   }
 

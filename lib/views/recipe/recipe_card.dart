@@ -21,11 +21,6 @@ class RecipeCard extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         onTap?.call();
-        Navigator.pushNamed(
-          context,
-          RecipeDetailScreen.routeName,
-          arguments: RecipeDetailScreen(recipe: recipe),
-        );
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

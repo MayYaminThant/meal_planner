@@ -1,11 +1,9 @@
-import 'dart:developer';
-
 import '../components/export_files.dart';
 import '../views/widget/error_text.dart';
 
 class Routers {
   static Route<dynamic> generateRoute(RouteSettings settings) {
-    log(settings.name.toString());
+    debugPrint(settings.name.toString());
     switch (settings.name) {
       case FavoriteScreen.routeName:
         return MaterialPageRoute(

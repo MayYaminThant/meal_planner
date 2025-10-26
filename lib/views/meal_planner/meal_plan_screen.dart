@@ -151,6 +151,7 @@ class _MealPlanScreenState extends State<MealPlanScreen> {
       builder: (context) {
         final selectedIds = <int>{};
         return AlertDialog(
+          insetPadding: const EdgeInsets.all(20),
           title: Text('Select Recipes for $day'),
           content: SizedBox(
             width: double.maxFinite,
@@ -176,13 +177,19 @@ class _MealPlanScreenState extends State<MealPlanScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
+              child: const Text(
+                "Cancel",
+                style: TextStyle(color: Colors.red),
+              ),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context, selectedIds.toList());
               },
-              child: const Text("Save"),
+              child: Text(
+                "Save",
+                style: TextStyle(color: ColorUtils.primaryColor),
+              ),
             ),
           ],
         );

@@ -29,6 +29,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       WifiController wifiController = context.read<WifiController>();
       await checkConnectivity(wifiController);
+      showSnackBar(wifiController.isOffline);
     });
     context.read<RecipeController>().getRandomRecipeList();
     // I don't know the main route so I used random recipe list
@@ -49,9 +50,12 @@ class _RecipeScreenState extends State<RecipeScreen> {
     if (isOffline) {
       _snackbarController ??= ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('You are offline'),
-          backgroundColor: ColorUtils.accentColor.withOpacity(0.2),
+          content: const Text('⚠︎ You are offline'),
+          backgroundColor: ColorUtils.accentColor.withOpacity(0.4),
           duration: const Duration(days: 1),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.only(bottom: 25, left: 12, right: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 14),
         ),
       );
     } else {
@@ -188,11 +192,13 @@ class _RecipeScreenState extends State<RecipeScreen> {
                   return e.id == recipe.id;
                 }) !=
                 -1,
-            // onTap: () => Navigator.pushNamed(
-            //   context,
-            //   '/recipe_details',
-            //   arguments: recipe,
-            // ),
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                RecipeDetailScreen.routeName,
+                arguments: RecipeDetailScreen(recipe: recipe),
+              );
+            },
             onFavoriteToggle: () {
               controller.toggleFavourite(recipe);
             },
